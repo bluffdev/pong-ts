@@ -10,6 +10,7 @@ export default class Game {
   private paddleOneDirection: number = 1;
   private movePaddleTwo: boolean = false;
   private paddleTwoDirection: number = 1;
+  private running: boolean = true;
 
   constructor(gameWidth: number, gameHeight: number) {
     this.canvas = new Canvas(gameWidth, gameHeight);
@@ -32,22 +33,36 @@ export default class Game {
       y: (gameHeight - gameWidth / 50) / 2,
     };
 
-    document.addEventListener("keydown", this.handleKeyDown);
-    document.addEventListener("keyup", this.handleKeyUp);
+    document.addEventListener("keydown", (e: KeyboardEvent) =>
+      this.handleKeyDown(e)
+    );
+    document.addEventListener("keyup", (e: KeyboardEvent) =>
+      this.handleKeyUp(e)
+    );
   }
 
   run() {
-    // let running = true;
-    // while (running) {
-    // timer
-    // game logic
-    // render
-    // }
+    this.simulateGame();
+  }
+
+  private simulateGame() {
+    if (this.movePaddleOne === true) {
+      this.padelOne.y += this.paddleOneDirection * 5;
+    }
+
+    if (this.movePaddleTwo === true) {
+      this.padelTwo.y += this.paddleTwoDirection * 5;
+    }
+
+    this.canvas.clear();
     this.canvas.draw(this.padelOne, this.padelTwo, this.ball);
+
+    requestAnimationFrame(() => this.simulateGame());
   }
 
   private handleKeyUp(e: KeyboardEvent) {
-    if (e.key === "ArrowUp" || e.key === "ArrowUp") this.movePaddleOne = false;
+    if (e.key === "ArrowUp" || e.key === "ArrowDown")
+      this.movePaddleOne = false;
     if (e.code === "KeyW" || e.code === "KeyS") this.movePaddleTwo = false;
   }
 
