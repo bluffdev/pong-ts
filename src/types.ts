@@ -3,6 +3,8 @@ export type padel = {
   height: number;
   x: number;
   y: number;
+  velocity: number;
+  acceleration: number;
 };
 
 export type ball = {
