@@ -6,10 +6,10 @@ export default class Game {
   private padelOne: padel;
   private padelTwo: padel;
   private ball: ball;
-  private movePaddleOne: boolean = false;
-  private paddleOneDirection: number = 1;
-  private movePaddleTwo: boolean = false;
-  private paddleTwoDirection: number = 1;
+  private movePaddleOneUp: boolean = false;
+  private movePaddleOneDown: boolean = false;
+  private movePaddleTwoUp: boolean = false;
+  private movePaddleTwoDown: boolean = false;
   private lastUpdate: number = 0;
   private deltaTime: number = 0;
   // private running: boolean = true;
@@ -39,12 +39,14 @@ export default class Game {
       y: (gameHeight - gameWidth / 50) / 2,
     };
 
-    document.addEventListener("keydown", (e: KeyboardEvent) =>
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      e.preventDefault(); 
       this.handleKeyDown(e)
-    );
-    document.addEventListener("keyup", (e: KeyboardEvent) =>
-      this.handleKeyUp(e)
-    );
+    });
+    document.addEventListener("keyup", (e: KeyboardEvent) => {
+      e.preventDefault();
+      this.handleKeyUp(e);
+    });
   }
 
   run() {
@@ -55,12 +57,20 @@ export default class Game {
     this.padelOne.acceleration = 0;
     this.padelTwo.acceleration = 0;
 
-    if (this.movePaddleOne) {
-      this.padelOne.acceleration += this.paddleOneDirection * 3000;
+    if (this.movePaddleOneUp) {
+      this.padelOne.acceleration -= 3000;
     }
 
-    if (this.movePaddleTwo) {
-      this.padelTwo.acceleration += this.paddleTwoDirection * 3000;
+    if (this.movePaddleOneDown) {
+      this.padelOne.acceleration += 3000;
+    }
+
+    if (this.movePaddleTwoUp) {
+      this.padelTwo.acceleration -= 3000;
+    }
+
+    if (this.movePaddleTwoDown) {
+      this.padelTwo.acceleration += 3000;
     }
 
     this.padelOne.acceleration -= this.padelOne.velocity * 5;
@@ -83,19 +93,16 @@ export default class Game {
   }
 
   private handleKeyUp(e: KeyboardEvent) {
-    if (e.key === "ArrowUp" || e.key === "ArrowDown")
-      this.movePaddleTwo = false;
-    if (e.code === "KeyW" || e.code === "KeyS") this.movePaddleOne = false;
+    if (e.key === "ArrowUp" || e.code === "ArrowUp") this.movePaddleTwoUp = false;
+    if (e.code === "ArraowDown" || e.key === "ArrowDown") this.movePaddleTwoDown = false;
+    if (e.code === "KeyW" || e.key === "KeyW") this.movePaddleOneUp = false;
+    if (e.key === "KeyS" || e.code === "KeyS") this.movePaddleOneDown = false;
   }
 
   private handleKeyDown(e: KeyboardEvent) {
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      this.movePaddleTwo = true;
-      this.paddleTwoDirection = e.code === "ArrowUp" ? -1 : 1;
-    }
-    if (e.code === "KeyW" || e.code === "KeyS") {
-      this.movePaddleOne = true;
-      this.paddleOneDirection = e.code === "KeyW" ? -1 : 1;
-    }
+    if (e.key === "ArrowUp" || e.code === "ArrowUp") this.movePaddleTwoUp = true;
+    if (e.key === "ArrowDown" || e.code === "ArrowDown") this.movePaddleTwoDown = true;
+    if (e.key === "KeyW" || e.code === "KeyW") this.movePaddleOneUp = true;
+    if (e.key === "KeyS" || e.code === "KeyS") this.movePaddleOneDown = true;
   }
 }
