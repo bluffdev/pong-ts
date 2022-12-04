@@ -37,6 +37,10 @@ export default class Game {
       height: gameWidth / 50,
       x: (gameWidth - gameWidth / 50) / 2,
       y: (gameHeight - gameWidth / 50) / 2,
+      velocity: {
+        x: 5,
+        y: 0
+      }
     };
 
     document.addEventListener("keydown", (e: KeyboardEvent) => {
@@ -50,37 +54,86 @@ export default class Game {
   }
 
   run() {
-    this.simulateGame();
-  }
-
-  private simulateGame() {
     this.padelOne.acceleration = 0;
     this.padelTwo.acceleration = 0;
 
     if (this.movePaddleOneUp) {
-      this.padelOne.acceleration -= 3000;
+      this.padelOne.acceleration -= 3500;
     }
 
     if (this.movePaddleOneDown) {
-      this.padelOne.acceleration += 3000;
+      this.padelOne.acceleration += 3500;
     }
 
     if (this.movePaddleTwoUp) {
-      this.padelTwo.acceleration -= 3000;
+      this.padelTwo.acceleration -= 3500;
     }
 
     if (this.movePaddleTwoDown) {
-      this.padelTwo.acceleration += 3000;
+      this.padelTwo.acceleration += 3500;
     }
 
     this.padelOne.acceleration -= this.padelOne.velocity * 5;
-    this.padelTwo.acceleration -= this.padelTwo.velocity * 5;
-
     this.padelOne.y += this.padelOne.velocity * this.deltaTime + this.padelOne.acceleration * this.deltaTime ** 2 * 0.5;
-    this.padelTwo.y += this.padelTwo.velocity * this.deltaTime + this.padelTwo.acceleration * this.deltaTime ** 2 * 0.5;
-
     this.padelOne.velocity += this.padelOne.acceleration * this.deltaTime;
+
+    if (this.padelOne.y <= 0) {
+      this.padelOne.y = 0;
+    } else if (this.padelOne.y + this.padelOne.height >= this.canvas.getHeight()) {
+      this.padelOne.y = this.canvas.getHeight() - this.padelOne.height;
+    }
+
+    this.padelTwo.acceleration -= this.padelTwo.velocity * 5;
+    this.padelTwo.y += this.padelTwo.velocity * this.deltaTime + this.padelTwo.acceleration * this.deltaTime ** 2 * 0.5;
     this.padelTwo.velocity += this.padelTwo.acceleration * this.deltaTime;
+
+    if (this.padelTwo.y <= 0) {
+      this.padelTwo.y = 0;
+    } else if (this.padelTwo.y + this.padelOne.height >= this.canvas.getHeight()) {
+      this.padelTwo.y = this.canvas.getHeight() - this.padelTwo.height;
+    }
+
+    this.ball.x -= this.ball.velocity.x;
+    this.ball.y += this.ball.velocity.y;
+
+    if (this.ball.y < 0) {
+      this.ball.y = 0;
+      this.ball.velocity.y *= -1;
+    }
+
+    if (this.ball.y + this.ball.height > this.canvas.getHeight()) {
+      this.ball.y = this.canvas.getHeight() - this.ball.height;
+      this.ball.velocity.y *= -1;
+    }
+
+    if (
+      (this.ball.x <= this.padelOne.x + this.padelOne.width) &&
+      (this.ball.y + this.ball.height > this.padelOne.y) && 
+      (this.ball.y < this.padelOne.y + this.padelOne.height) &&
+      (this.ball.x > 0)
+    ) {
+      this.ball.x = this.padelOne.x + this.padelOne.width;
+      this.ball.velocity.x *= -1;
+      this.ball.velocity.y = this.padelOne.velocity * 0.005;
+    }
+
+    if (
+      (this.ball.x + this.ball.width >= this.padelTwo.x) &&
+      (this.ball.y + this.ball.height > this.padelTwo.y) &&
+      (this.ball.y < this.padelTwo.y + this.padelTwo.height) &&
+      (this.ball.x + this.ball.width < this.canvas.getWidth())
+    ) {
+      this.ball.x = this.padelTwo.x - this.ball.width;
+      this.ball.velocity.x *= -1;
+      this.ball.velocity.y = this.padelTwo.velocity * 0.005;
+    }
+
+    if (this.ball.x < 0 || this.ball.x + this.ball.width > this.canvas.getWidth()) {
+      this.ball.x = (this.canvas.getWidth() - this.canvas.getWidth() / 50) / 2;
+      this.ball.y = (this.canvas.getHeight() - this.canvas.getWidth() / 50) / 2;
+      this.ball.velocity.x = 5;
+      this.ball.velocity.y = 0;
+    }
 
     this.canvas.clear();
     this.canvas.draw(this.padelOne, this.padelTwo, this.ball);
@@ -89,7 +142,22 @@ export default class Game {
     this.deltaTime = (now - this.lastUpdate) / 1000;
     this.lastUpdate = now;
 
-    requestAnimationFrame(() => this.simulateGame());
+    requestAnimationFrame(() => this.run());
+  }
+
+  private reset() {
+    this.padelOne.y = (this.canvas.getHeight()- this.canvas.getHeight() / 5) / 2;
+    this.padelOne.velocity = 0,
+    this.padelOne.acceleration = 0;
+
+    this.padelTwo.y = (this.canvas.getHeight() - this.canvas.getHeight() / 5) / 2;
+    this.padelTwo.velocity = 0,
+    this.padelTwo.acceleration = 0;
+
+    this.ball.x = (this.canvas.getWidth() - this.canvas.getWidth() / 50) / 2;
+    this.ball.y = (this.canvas.getHeight() - this.canvas.getWidth() / 50) / 2;
+    this.ball.velocity.x = 5;
+    this.ball.velocity.y = 0;
   }
 
   private handleKeyUp(e: KeyboardEvent) {

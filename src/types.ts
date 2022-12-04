@@ -12,4 +12,8 @@ export type ball = {
   height: number;
   x: number;
   y: number;
+  velocity: {
+    x: number,
+    y: number
+  }
 };

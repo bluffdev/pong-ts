@@ -37,4 +37,12 @@ export default class Canvas {
     this.context.fillStyle = "red";
     this.context.fillRect(ball.x, ball.y, ball.width, ball.height);
   }
+
+  getWidth() {
+    return this.width;
+  }
+
+  getHeight() {
+    return this.height;
+  }
 }
