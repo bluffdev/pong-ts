@@ -6,13 +6,15 @@ export default class Game {
   private padelOne: padel;
   private padelTwo: padel;
   private ball: ball;
+  private playerOneScore: number = 0;
+  private playerTwoScore: number = 0;
   private movePaddleOneUp: boolean = false;
   private movePaddleOneDown: boolean = false;
   private movePaddleTwoUp: boolean = false;
   private movePaddleTwoDown: boolean = false;
   private lastUpdate: number = 0;
   private deltaTime: number = 0;
-  // private running: boolean = true;
+  private isRunning: boolean = false;
 
   constructor(gameWidth: number, gameHeight: number) {
     this.canvas = new Canvas(gameWidth, gameHeight);
@@ -51,6 +53,8 @@ export default class Game {
       e.preventDefault();
       this.handleKeyUp(e);
     });
+
+    this.canvas.draw(this.padelOne, this.padelTwo, this.ball, this.playerOneScore, this.playerTwoScore);
   }
 
   run() {
@@ -129,23 +133,34 @@ export default class Game {
     }
 
     if (this.ball.x < 0 || this.ball.x + this.ball.width > this.canvas.getWidth()) {
+      if (this.ball.x < 0) {
+        this.playerTwoScore += 1;
+      } else {
+        this.playerOneScore += 1;
+      }
+
       this.ball.x = (this.canvas.getWidth() - this.canvas.getWidth() / 50) / 2;
       this.ball.y = (this.canvas.getHeight() - this.canvas.getWidth() / 50) / 2;
-      this.ball.velocity.x = 5;
+
+      let horizontal = Math.random();
+
+      this.ball.velocity.x = horizontal >= 0.5 ? 5 : -5;
       this.ball.velocity.y = 0;
     }
 
     this.canvas.clear();
-    this.canvas.draw(this.padelOne, this.padelTwo, this.ball);
+    this.canvas.draw(this.padelOne, this.padelTwo, this.ball, this.playerOneScore, this.playerTwoScore);  
 
     let now = Date.now();
     this.deltaTime = (now - this.lastUpdate) / 1000;
     this.lastUpdate = now;
 
-    requestAnimationFrame(() => this.run());
+    if (this.isRunning) {
+      requestAnimationFrame(() => this.run());
+    }
   }
 
-  private reset() {
+  reset() {
     this.padelOne.y = (this.canvas.getHeight()- this.canvas.getHeight() / 5) / 2;
     this.padelOne.velocity = 0,
     this.padelOne.acceleration = 0;
@@ -158,6 +173,11 @@ export default class Game {
     this.ball.y = (this.canvas.getHeight() - this.canvas.getWidth() / 50) / 2;
     this.ball.velocity.x = 5;
     this.ball.velocity.y = 0;
+
+    this.playerOneScore = 0;
+    this.playerTwoScore = 0;
+
+    this.canvas.draw(this.padelOne, this.padelTwo, this.ball, this.playerOneScore, this.playerTwoScore);
   }
 
   private handleKeyUp(e: KeyboardEvent) {
@@ -172,5 +192,9 @@ export default class Game {
     if (e.key === "ArrowDown" || e.code === "ArrowDown") this.movePaddleTwoDown = true;
     if (e.key === "KeyW" || e.code === "KeyW") this.movePaddleOneUp = true;
     if (e.key === "KeyS" || e.code === "KeyS") this.movePaddleOneDown = true;
+  }
+
+  setIsRunning(val: boolean) {
+    this.isRunning = val;
   }
 }

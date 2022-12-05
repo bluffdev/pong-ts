@@ -9,5 +9,29 @@ import Game from "./game";
   const heightScalor = 3;
 
   const game = new Game(sizeFactor * widthScalor, sizeFactor * heightScalor);
-  game.run();
+
+  const startButton = document.getElementById('start') as HTMLButtonElement;
+  const resetButton = document.getElementById('reset') as HTMLButtonElement;
+
+  let isRunning = false;
+
+  startButton.addEventListener('click', (e: Event) => {
+    e.preventDefault();
+    if (!isRunning) {
+      game.setIsRunning(true);
+      game.run();
+      isRunning = true;
+    }
+  });
+
+  resetButton.addEventListener('click', (e: Event) => {
+    e.preventDefault();
+    if (isRunning) {
+      game.setIsRunning(false);
+      game.reset();
+      isRunning = false;
+    }
+  })
+
+  // game.run();
 })();
