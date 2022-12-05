@@ -32,6 +32,4 @@ import Game from "./game";
       isRunning = false;
     }
   })
-
-  // game.run();
 })();
