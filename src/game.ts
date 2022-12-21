@@ -40,7 +40,7 @@ export default class Game {
       x: (gameWidth - gameWidth / 50) / 2,
       y: (gameHeight - gameWidth / 50) / 2,
       velocity: {
-        x: 5,
+        x: 6.5,
         y: 0
       }
     };
